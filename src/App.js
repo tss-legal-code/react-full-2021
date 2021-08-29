@@ -2,28 +2,37 @@ import React, { useEffect, useRef, useState } from 'react'
 // import Counter from './components/Counter'
 import './styles/App.css'
 import PostList from './components/PostList'
-import MyButton from './components/UI/button/MyButton'
-import MyInput from './components/UI/input/MyInput'
 import PostForm from './components/PostForm'
 import { GET_DB, SET_DB } from './ioLocalStorage'
-
+import MySelect from "./components/UI/select/MySelect"
+import MyInput from './components/UI/input/MyInput'
 
 function App() {
 
   const postListTitle = "POSTS"
 
-  const [postList, setPostList] = useState(GET_DB)
+  const [postList, setPostList] = useState(GET_DB())
 
-  const addPost = (post) => {
+  const idForAddingPost = function* () {
+    let lastId = 0
+    postList.forEach(postDataset => { if (postDataset.id >= lastId) lastId = postDataset.id })
+    while (true)
+      yield ++lastId;
+  }()
+
+  const addPost = (postWithoutId) => {
+    const newPost = {
+      id: idForAddingPost.next().value,
+      title: postWithoutId.title,
+      body: postWithoutId.body
+    }
     setPostList(
       [
         ...postList,
-        post
+        newPost
       ]
     )
-    console.log(`adding ${JSON.stringify(post)} to localStorage`)
-    // SET_DB(postList) // update localStorage
-    // console.table(GET_DB())
+    console.log(`adding ${JSON.stringify(newPost)} to localStorage`)
   }
 
   const removePost = (post) => {
@@ -34,14 +43,32 @@ function App() {
       )
     )
     console.log(`removing ${JSON.stringify(post)} from localStorage`)
-    // SET_DB(postList) // update localStorage
-    // console.table(GET_DB())
   }
 
   useEffect(() => {
     SET_DB(postList)
-    console.table(GET_DB())
   }, [postList])
+
+  const [selectedSort, setSelectedSort] = useState("")
+
+  useEffect(
+    () => {
+      if (selectedSort) setPostList([...postList].
+        sort(
+          (a, b) =>
+            a[selectedSort].
+              localeCompare(
+                b[selectedSort]
+              )
+        )
+      )
+    }, [selectedSort, postList.length])
+  const sortPosts = (sortBy) => {
+    setSelectedSort(sortBy)
+  }
+
+  const [searchQuery, setSearchQuery] = useState('')
+
 
   return (
     <div className="App">
@@ -49,18 +76,36 @@ function App() {
         postList={postList}
         addPost={addPost} />
 
+
+      <hr style={{ margin: "15px 0" }} />
+      <MyInput
+        value={searchQuery}
+        placeholder="Searching ... "
+        onChange={e => setSearchQuery(e.target.value)}
+      />
+      <MySelect
+        value={selectedSort}
+        onChange={setSelectedSort}
+        options={
+          [
+            { id: 0, name: "sort by title", value: 'title' },
+            { id: 1, name: "sort by body", value: 'body' },
+          ]
+        }
+        defaultOption="no sorting" />
+
       {
         postList.length === 0
-          
+
           ? <h1 style={{ textAlign: "center" }}>
             NO POSTS TO DISPLAY
           </h1>
-          
+
           : <PostList
             postList={postList}
             removePost={removePost}
             postListTitle={postListTitle} />
-            
+
       }
 
     </div>

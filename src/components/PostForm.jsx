@@ -10,10 +10,11 @@ const PostForm = ({ addPost }) => {
     }
     const [post, setPost] = useState(initialPostObject)
 
+    
+
     const sendAddPost = (event) => {
         event.preventDefault()
         addPost({
-            id: Date.now(),
             title: post.title,
             body: post.body
         })

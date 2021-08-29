@@ -7,10 +7,12 @@ export const SET_DB = (value) => SET(DB, value)
 
 const defaultPostsContent = [
     { id: 1, title: "JS", body: "JAVASCRIPT" },
-    { id: 2, title: "TS", body: "TYPESCRIPT" },
-    { id: 3, title: "J", body: "JAVA" },
-    { id: 4, title: "S", body: "SCRIPT" },
+    { id: 2, title: "Any script", body: "SCRIPT" },
+    { id: 3, title: "Running ... many devices", body: "JAVA" },
+    { id: 4, title: "TS", body: "TYPESCRIPT" },
 ]
+
+
 
 export const checkOrInit_DB = () => {
     try {
@@ -27,7 +29,7 @@ export const checkOrInit_DB = () => {
         console.log("Object 'localStorage' is unavailable due to error: " + error);
     }
 
-    // deem it as our server, we communicate with to store data (create, update & delete new records)
+    // deem it as our "server", we communicate with to store data (create, update & delete new posts)
     if (!GET_DB()) {
         console.log("setting up default posts content");
         SET_DB(defaultPostsContent);
@@ -43,9 +45,9 @@ export const checkOrInit_DB = () => {
         ) {
             console.log("setting up default posts content...");
             SET_DB(defaultPostsContent)
-            console.table(GET_DB())
+            
         }
+    } else {
+        console.log(`posts content is present in localStorage: `)
     }
-    console.log(`posts content is present in localStorage: `)
-    console.table(GET_DB())
 }
