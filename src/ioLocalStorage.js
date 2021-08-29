@@ -37,17 +37,17 @@ export const checkOrInit_DB = () => {
     } else if (GET_DB().length === 0) {
         if (window.confirm
             (
-                "The database seems to be present, but it is empty.\n" +
-                "\nDo you wish to fill datatbase with default posts content?\n" +
+                "The existing database is empty.\n" +
+                "\nDo you wish to fill your datatbase with default posts content shown below?\n" +
                 "Default posts content is:\n" +
                 defaultPostsContent.reduce((accumulator, currentValue) => accumulator += JSON.stringify(currentValue) + "\n   ", "   ")
             )
         ) {
-            console.log("setting up default posts content...");
+            console.log("restoring up default posts content...");
             SET_DB(defaultPostsContent)
             
         }
     } else {
-        console.log(`posts content is present in localStorage: `)
+        console.log(`posts content is restored from the localStorage `)
     }
 }

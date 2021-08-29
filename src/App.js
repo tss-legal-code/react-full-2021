@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 // import Counter from './components/Counter'
 import './styles/App.css'
 import PostList from './components/PostList'
@@ -47,27 +47,35 @@ function App() {
 
   useEffect(() => {
     SET_DB(postList)
-  }, [postList])
+  }, [postList.length])
 
   const [selectedSort, setSelectedSort] = useState("")
 
-  useEffect(
+  const sortedPosts = useMemo(
     () => {
-      if (selectedSort) setPostList([...postList].
-        sort(
-          (a, b) =>
-            a[selectedSort].
-              localeCompare(
-                b[selectedSort]
-              )
-        )
-      )
-    }, [selectedSort, postList.length])
-  const sortPosts = (sortBy) => {
-    setSelectedSort(sortBy)
-  }
+      if (selectedSort) {
+        return [...postList].
+          sort(
+            (a, b) =>
+              a[selectedSort].
+                localeCompare(
+                  b[selectedSort]
+                )
+          )
+      }
+      return postList
+    },
+    [selectedSort, postList])
+
 
   const [searchQuery, setSearchQuery] = useState('')
+
+  const sortedAndSearchedPosts = useMemo(() => {
+    return sortedPosts.filter(post =>
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.body.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [searchQuery, sortedPosts])
 
 
   return (
@@ -102,7 +110,8 @@ function App() {
           </h1>
 
           : <PostList
-            postList={postList}
+            // postList={postList}
+            postList={sortedAndSearchedPosts}
             removePost={removePost}
             postListTitle={postListTitle} />
 

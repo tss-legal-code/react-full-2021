@@ -40,7 +40,7 @@ const PostForm = ({ addPost }) => {
             <MyButton
                 onClick={sendAddPost }
             >
-            SOME LONG TEXT
+            POST
             </MyButton>
         </form >
     )
