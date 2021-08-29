@@ -1,101 +1,68 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 // import Counter from './components/Counter'
 import './styles/App.css'
 import PostList from './components/PostList'
 import MyButton from './components/UI/button/MyButton'
 import MyInput from './components/UI/input/MyInput'
+import PostForm from './components/PostForm'
+import { GET_DB, SET_DB } from './ioLocalStorage'
+
 
 function App() {
 
-  const postListTitle = "...HERE WE GO AGAIN"
+  const postListTitle = "POSTS"
 
-  const [postList, setPostList] = useState([
-    { id: 1, title: "JS", body: "JAVASCRIPT" },
-    { id: 2, title: "TS", body: "TYPESCRIPT" },
-    { id: 3, title: "J", body: "JAVA" },
-    { id: 4, title: "S", body: "SCRIPT" },
-  ])
+  const [postList, setPostList] = useState(GET_DB)
 
-
-  const composeDeletePostCommand =
-    (list, setList) => /// in case if we have to display and manage several lists
-      (id) =>
-        setList(
-          list.filter(
-            singlePost =>
-              singlePost.id !== id
-          )
-        )
-
-  const initialPostObject = {
-    title: "",
-    body: ""
-  }
-  const [post, setPost] = useState(initialPostObject)
-  // const [title, setTitle] = useState('')
-  // const bodyInputRef = useRef()
-
-  const idFor_PostList = function* () {
-    let lastId = 0
-    postList.forEach(postDataset => { if (postDataset.id >= lastId) lastId = postDataset.id })
-    while (true)
-      yield ++lastId;
-  }()
-
-  const addNewPost = (event) => {
-    event.preventDefault()
-
+  const addPost = (post) => {
     setPostList(
-      // postList.concat({
-      //   id: idFor_PostList.next().value,
-      //   title: title,
-      //   body: bodyInputRef.current.value
-      // })
-      [...postList, {
-        id: idFor_PostList.next().value,
-        title: post.title,
-        body: post.body //bodyInputRef.current.value
-      }]
+      [
+        ...postList,
+        post
+      ]
     )
-
-    setPost(initialPostObject)
-    // setTitle('')
-    // bodyInputRef.current.value = ""
+    console.log(`adding ${JSON.stringify(post)} to localStorage`)
+    // SET_DB(postList) // update localStorage
+    // console.table(GET_DB())
   }
 
+  const removePost = (post) => {
+    setPostList(
+      postList.filter(
+        singlePost =>
+          singlePost.id !== post.id
+      )
+    )
+    console.log(`removing ${JSON.stringify(post)} from localStorage`)
+    // SET_DB(postList) // update localStorage
+    // console.table(GET_DB())
+  }
 
+  useEffect(() => {
+    SET_DB(postList)
+    console.table(GET_DB())
+  }, [postList])
 
   return (
     <div className="App">
-      <form>
-
-        {/* CONTROLLABLE COMPONENT */}
-        <MyInput
-          value={post.title}
-          onChange={(event) => setPost({ ...post, title: event.target.value })}
-          type="text"
-          placeholder="post title" />
-
-        {/* NONCONTROLLABLE COMPONENT */}
-        <MyInput
-          value={post.body}
-          // ref={bodyInputRef}
-          onChange={(event) => setPost({ ...post, body: event.target.value })}
-          type="text"
-          placeholder="post body" />
-        <MyButton
-
-          onClick={addNewPost}
-        >
-          SOME LONG TEXT
-        </MyButton>
-
-      </form>
-
-      <PostList
+      <PostForm
         postList={postList}
-        deletePostCommand={composeDeletePostCommand(postList, setPostList)}
-        postListTitle={postListTitle} />
+        addPost={addPost} />
+
+      {
+        postList.length === 0
+          
+          ? <h1 style={{ textAlign: "center" }}>
+            NO POSTS TO DISPLAY
+          </h1>
+          
+          : <PostList
+            postList={postList}
+            removePost={removePost}
+            postListTitle={postListTitle} />
+            
+      }
+
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React from 'react'
 import Post from './Post'
 
-const PostList = ({ postList, deletePostCommand, postListTitle }) => {
+const PostList = ({ postList, removePost, postListTitle }) => {   
+
     return (
         <div>
             <h1
@@ -18,7 +19,7 @@ const PostList = ({ postList, deletePostCommand, postListTitle }) => {
                             key={singlePost.id}
                             title={singlePost.title}
                             body={singlePost.body}
-                            deletePostCommand={() => deletePostCommand(singlePost.id)}
+                            removePost={() => removePost(singlePost)}
                         />
                 )
             }
