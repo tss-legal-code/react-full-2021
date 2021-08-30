@@ -8,6 +8,7 @@ import { GET_DB, SET_DB } from './ioLocalStorage'
 import PostFilter from './components/PostFilter'
 import MyModal from './components/UI/modal/MyModal'
 import MyButton from './components/UI/button/MyButton'
+import { usePosts } from './hooks/usePost'
 
 function App() {
 
@@ -54,30 +55,30 @@ function App() {
 
   const [filter, setFilter] = useState({ sort: "", query: "" })
 
-  const sortedPosts = useMemo(
-    () => {
-      if (filter.sort) {
-        return [...postList].
-          sort(
-            (a, b) =>
-              a[filter.sort].
-                localeCompare(
-                  b[filter.sort]
-                )
-          )
-      }
-      return postList
-    },
-    [filter.sort, postList])
+  // const sortedPosts = useMemo(
+  //   () => {
+  //     if (filter.sort) {
+  //       return [...postList].
+  //         sort(
+  //           (a, b) =>
+  //             a[filter.sort].
+  //               localeCompare(
+  //                 b[filter.sort]
+  //               )
+  //         )
+  //     }
+  //     return postList
+  //   },
+  //   [filter.sort, postList])
 
+  const sortedAndSearchedPosts = usePosts(postList, filter.sort, filter.query)
 
-
-  const sortedAndSearchedPosts = useMemo(() => {
-    return sortedPosts.filter(post =>
-      post.title.toLowerCase().includes(filter.query.toLowerCase()) ||
-      post.body.toLowerCase().includes(filter.query.toLowerCase())
-    )
-  }, [filter.query, sortedPosts])
+  // const sortedAndSearchedPosts = useMemo(() => {
+  //   return sortedPosts.filter(post =>
+  //     post.title.toLowerCase().includes(filter.query.toLowerCase()) ||
+  //     post.body.toLowerCase().includes(filter.query.toLowerCase())
+  //   )
+  // }, [filter.query, sortedPosts])
 
   const [modal,setModal] = useState(false)
 

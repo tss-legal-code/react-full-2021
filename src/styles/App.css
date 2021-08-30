@@ -22,3 +22,21 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.trans-enter {
+    transform: translateX(-350px);
+}
+
+.trans-enter-active {
+    transform: translateX(0px);
+    transition: all 150ms ease-in;
+}
+.trans-exit {
+    opacity: 1;
+}
+
+.trans-exit-active {
+    transform: translateX(-350px);
+    opacity: 0;
+    transition: all 150ms ease-in;
+}
