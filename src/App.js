@@ -1,11 +1,13 @@
+// https://www.youtube.com/watch?v=GNrdg3PzpJQ  
+
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-// import Counter from './components/Counter'
 import './styles/App.css'
 import PostList from './components/PostList'
 import PostForm from './components/PostForm'
 import { GET_DB, SET_DB } from './ioLocalStorage'
-import MySelect from "./components/UI/select/MySelect"
-import MyInput from './components/UI/input/MyInput'
+import PostFilter from './components/PostFilter'
+import MyModal from './components/UI/modal/MyModal'
+import MyButton from './components/UI/button/MyButton'
 
 function App() {
 
@@ -33,6 +35,7 @@ function App() {
       ]
     )
     console.log(`adding ${JSON.stringify(newPost)} to localStorage`)
+    setModal(false)
   }
 
   const removePost = (post) => {
@@ -49,73 +52,63 @@ function App() {
     SET_DB(postList)
   }, [postList.length])
 
-  const [selectedSort, setSelectedSort] = useState("")
+  const [filter, setFilter] = useState({ sort: "", query: "" })
 
   const sortedPosts = useMemo(
     () => {
-      if (selectedSort) {
+      if (filter.sort) {
         return [...postList].
           sort(
             (a, b) =>
-              a[selectedSort].
+              a[filter.sort].
                 localeCompare(
-                  b[selectedSort]
+                  b[filter.sort]
                 )
           )
       }
       return postList
     },
-    [selectedSort, postList])
+    [filter.sort, postList])
 
 
-  const [searchQuery, setSearchQuery] = useState('')
 
   const sortedAndSearchedPosts = useMemo(() => {
     return sortedPosts.filter(post =>
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.body.toLowerCase().includes(searchQuery.toLowerCase())
+      post.title.toLowerCase().includes(filter.query.toLowerCase()) ||
+      post.body.toLowerCase().includes(filter.query.toLowerCase())
     )
-  }, [searchQuery, sortedPosts])
+  }, [filter.query, sortedPosts])
+
+  const [modal,setModal] = useState(false)
 
 
   return (
     <div className="App">
-      <PostForm
-        postList={postList}
-        addPost={addPost} />
+      <MyButton style={{marginTop: "30px"}} onClick={()=> setModal(true)}>
+        CREATE POST
+      </MyButton>
+
+      <MyModal visible={modal} setVisible={setModal}>
+        <PostForm
+          postList={postList}
+          addPost={addPost} />
+      </MyModal>
 
 
-      <hr style={{ margin: "15px 0" }} />
-      <MyInput
-        value={searchQuery}
-        placeholder="Searching ... "
-        onChange={e => setSearchQuery(e.target.value)}
-      />
-      <MySelect
-        value={selectedSort}
-        onChange={setSelectedSort}
-        options={
-          [
-            { id: 0, name: "sort by title", value: 'title' },
-            { id: 1, name: "sort by body", value: 'body' },
-          ]
-        }
-        defaultOption="no sorting" />
+      <hr style={{ margin: "15px 0", color: 'black' }} />
 
-      {
-        postList.length === 0
+      <PostFilter
+        filter={filter}
+        setFilter={setFilter} />
 
-          ? <h1 style={{ textAlign: "center" }}>
-            NO POSTS TO DISPLAY
-          </h1>
+      <hr style={{ margin: "15px 0", color: 'black' }} />
 
-          : <PostList
-            // postList={postList}
-            postList={sortedAndSearchedPosts}
-            removePost={removePost}
-            postListTitle={postListTitle} />
+      <PostList
+        postList={sortedAndSearchedPosts}
+        removePost={removePost}
+        postListTitle={postListTitle} />
 
-      }
+
 
     </div>
   );
